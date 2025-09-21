@@ -8,6 +8,12 @@
   <!-- Manifest y colores -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#3a0ca3">
+  
+  <!-- Metaetiquetas para iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="WeighBuddy">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
 
   <!-- Iconos -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -79,22 +85,49 @@
     });
 
     function saveProfile() {
-      profile.startWeight = parseFloat(document.getElementById("startWeight").value);
-      profile.height = parseFloat(document.getElementById("height").value);
-      profile.goal = parseFloat(document.getElementById("goal").value);
+      const startWeight = parseFloat(document.getElementById("startWeight").value);
+      const height = parseFloat(document.getElementById("height").value);
+      const goal = parseFloat(document.getElementById("goal").value);
+      
+      if (isNaN(startWeight) || isNaN(height) || isNaN(goal)) {
+        showNotification('Por favor, completa todos los campos con valores válidos', 'error');
+        return;
+      }
+      
+      if (goal <= 0 || startWeight <= 0 || height <= 0) {
+        showNotification('Los valores deben ser mayores a cero', 'error');
+        return;
+      }
+      
+      profile.startWeight = startWeight;
+      profile.height = height;
+      profile.goal = goal;
       localStorage.setItem("profile", JSON.stringify(profile));
+      
+      showNotification('Perfil guardado correctamente', 'success');
       updateResults();
     }
 
     function addWeight() {
       const weightInput = document.getElementById("weight");
       const weight = parseFloat(weightInput.value);
-      if (!isNaN(weight)) {
-        weights.push(weight);
-        localStorage.setItem("weights", JSON.stringify(weights));
-        updateChart();
-        weightInput.value = "";
+      
+      if (isNaN(weight)) {
+        showNotification('Por favor, introduce un peso válido', 'error');
+        return;
       }
+      
+      if (weight <= 0) {
+        showNotification('El peso debe ser mayor a cero', 'error');
+        return;
+      }
+      
+      weights.push(weight);
+      localStorage.setItem("weights", JSON.stringify(weights));
+      updateChart();
+      weightInput.value = "";
+      
+      showNotification('Peso añadido correctamente', 'success');
     }
 
     function updateChart() {
@@ -116,10 +149,98 @@
       }
     }
 
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.textContent = message;
+      notification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 12px 24px;
+        border-radius: 30px;
+        color: white;
+        font-weight: bold;
+        z-index: 1000;
+        background: ${type === 'success' ? '#4caf50' : '#f44336'};
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 3000);
+    }
+
+    // Instalación de la PWA
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      showInstallPromotion();
+    });
+
+    function showInstallPromotion() {
+      const installButton = document.createElement('button');
+      installButton.textContent = 'Instalar WeighBuddy';
+      installButton.id = 'installButton';
+      installButton.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #3a0ca3, #7209b7);
+        color: white;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        z-index: 1000;
+        font-weight: bold;
+      `;
+      
+      installButton.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        if (outcome === 'accepted') {
+          console.log('Usuario aceptó la instalación');
+        }
+        
+        deferredPrompt = null;
+        document.body.removeChild(installButton);
+      });
+      
+      document.body.appendChild(installButton);
+    }
+
+    // Cargar datos guardados
     if (profile.startWeight) document.getElementById("startWeight").value = profile.startWeight;
     if (profile.height) document.getElementById("height").value = profile.height;
     if (profile.goal) document.getElementById("goal").value = profile.goal;
     updateChart();
+
+    // Solicitar permiso para notificaciones (opcional)
+    function askNotificationPermission() {
+      if (!('Notification' in window)) {
+        console.log('Notificaciones no soportadas');
+        return;
+      }
+      
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          console.log('Permiso para notificaciones concedido');
+        }
+      });
+    }
+
+    // Llamar a la función de permiso de notificaciones cuando el usuario interactúe
+    // Por ejemplo, al hacer clic en un botón o al guardar el perfil
+    // askNotificationPermission();
   </script>
 
   <!-- Registrar Service Worker -->
