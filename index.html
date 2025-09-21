@@ -3,87 +3,354 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WeighBuddy</title>
-
-  <!-- Manifest y colores -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#3a0ca3">
-  
-  <!-- Metaetiquetas para iOS -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="WeighBuddy">
-  <link rel="apple-touch-icon" href="/icons/icon-192.png">
-
-  <!-- Iconos -->
+  <title>WeighBuddy - Tu compañero de progreso</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Estilos generales */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  <!-- Estilos externos -->
-  <link rel="stylesheet" href="style.css">
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #3a0ca3 0%, #4361ee 50%, #7209b7 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+      padding: 20px;
+    }
+
+    /* Contenedor principal */
+    .app-container {
+      width: 100%;
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      margin: 20px auto;
+    }
+
+    /* Encabezado */
+    header {
+      text-align: center;
+      padding: 25px 20px;
+      background: linear-gradient(135deg, #3a0ca3, #7209b7);
+      color: white;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    header p {
+      margin-top: 8px;
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    /* Contenido principal */
+    main {
+      padding: 20px;
+    }
+
+    /* Tarjetas */
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: #3a0ca3;
+      text-align: center;
+      font-size: 20px;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    /* Formularios */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #4a4a4a;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #e6e6e6;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #3a0ca3;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(58, 12, 163, 0.2);
+    }
+
+    /* Botones */
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #3a0ca3, #7209b7);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(58, 12, 163, 0.25);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* Resultados */
+    #results {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: #4a4a4a;
+      white-space: pre-line;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      border-left: 4px solid #3a0ca3;
+    }
+
+    /* Gráfico */
+    .chart-container {
+      margin-top: 20px;
+      position: relative;
+      height: 250px;
+      width: 100%;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 15px;
+      color: white;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    /* Responsividad */
+    @media (max-width: 600px) {
+      .app-container {
+        border-radius: 15px;
+      }
+      
+      header {
+        padding: 20px 15px;
+      }
+      
+      header h1 {
+        font-size: 24px;
+      }
+      
+      main {
+        padding: 15px;
+      }
+      
+      .card {
+        padding: 15px;
+      }
+      
+      input, button {
+        padding: 12px;
+      }
+    }
+
+    /* Notificaciones */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 24px;
+      border-radius: 30px;
+      color: white;
+      font-weight: bold;
+      z-index: 1000;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.3s, fadeOut 0.3s 2.7s forwards;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; bottom: 0; }
+      to { opacity: 1; bottom: 20px; }
+    }
+    
+    @keyframes fadeOut {
+      from { opacity: 1; bottom: 20px; }
+      to { opacity: 0; bottom: 0; }
+    }
+    
+    .success {
+      background: #4caf50;
+    }
+    
+    .error {
+      background: #f44336;
+    }
+
+    /* Botón de instalación */
+    #installButton {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: auto;
+      padding: 12px 20px;
+      border-radius: 30px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1><i class="fa-solid fa-weight-scale"></i> WeighBuddy</h1>
-    <p>Tu compañero para seguir tu progreso</p>
-  </header>
+  <div class="app-container">
+    <header>
+      <h1><i class="fa-solid fa-weight-scale"></i> WeighBuddy</h1>
+      <p>Tu compañero para seguir tu progreso</p>
+    </header>
 
-  <main>
-    <section class="card">
-      <h2>Datos personales</h2>
-      <label for="startWeight">Peso inicial (kg):</label>
-      <input type="number" id="startWeight">
+    <main>
+      <section class="card">
+        <h2>Datos personales</h2>
+        <div class="form-group">
+          <label for="startWeight">Peso inicial (kg):</label>
+          <input type="number" id="startWeight" placeholder="Ej: 70.5">
+        </div>
+        
+        <div class="form-group">
+          <label for="height">Altura (cm):</label>
+          <input type="number" id="height" placeholder="Ej: 175">
+        </div>
+        
+        <div class="form-group">
+          <label for="goal">Meta de peso (kg):</label>
+          <input type="number" id="goal" placeholder="Ej: 65.0">
+        </div>
 
-      <label for="height">Altura (cm):</label>
-      <input type="number" id="height">
+        <button onclick="saveProfile()"><i class="fa-solid fa-user-check"></i> Guardar perfil</button>
+      </section>
 
-      <label for="goal">Meta de peso (kg):</label>
-      <input type="number" id="goal">
+      <section class="card">
+        <h2>Seguimiento</h2>
+        <div class="form-group">
+          <label for="weight">Nuevo peso (kg):</label>
+          <input type="number" id="weight" placeholder="Ej: 68.3">
+        </div>
+        <button onclick="addWeight()"><i class="fa-solid fa-plus"></i> Añadir peso</button>
 
-      <button onclick="saveProfile()"><i class="fa-solid fa-user-check"></i> Guardar perfil</button>
-    </section>
+        <div id="results"></div>
+        <div class="chart-container">
+          <canvas id="weightChart"></canvas>
+        </div>
+      </section>
+    </main>
+  </div>
 
-    <section class="card">
-      <h2>Seguimiento</h2>
-      <label for="weight">Nuevo peso (kg):</label>
-      <input type="number" id="weight">
-      <button onclick="addWeight()"><i class="fa-solid fa-plus"></i> Añadir peso</button>
+  <footer>
+    &copy; 2023 WeighBuddy - Tu progreso, nuestra misión
+  </footer>
 
-      <div id="results"></div>
-      <canvas id="weightChart"></canvas>
-    </section>
-  </main>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Lógica -->
   <script>
+    // Variables globales
     let profile = JSON.parse(localStorage.getItem("profile")) || { startWeight: null, height: null, goal: null };
     let weights = JSON.parse(localStorage.getItem("weights")) || [];
+    let chart;
 
-    const ctx = document.getElementById("weightChart").getContext("2d");
-    let chart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: weights.map((_, i) => `Día ${i+1}`),
-        datasets: [{
-          label: "Peso (kg)",
-          data: weights,
-          borderColor: "#3a0ca3",
-          backgroundColor: "rgba(58,12,163,0.2)",
-          fill: true,
-          tension: 0.3,
-          pointRadius: 5,
-          pointBackgroundColor: "#7209b7"
-        }]
-      },
-      options: {
-        plugins: {
-          legend: { display: false }
+    // Inicialización del gráfico
+    function initChart() {
+      const ctx = document.getElementById("weightChart").getContext("2d");
+      chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: weights.map((_, i) => `Día ${i+1}`),
+          datasets: [{
+            label: "Peso (kg)",
+            data: weights,
+            borderColor: "#3a0ca3",
+            backgroundColor: "rgba(58, 12, 163, 0.2)",
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5,
+            pointBackgroundColor: "#7209b7",
+            pointBorderColor: "#ffffff",
+            pointBorderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { 
+              display: false 
+            },
+            tooltip: {
+              backgroundColor: 'rgba(58, 12, 163, 0.8)',
+              titleFont: {
+                size: 14
+              },
+              bodyFont: {
+                size: 14
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
         }
-      }
-    });
+      });
+    }
 
+    // Guardar perfil
     function saveProfile() {
       const startWeight = parseFloat(document.getElementById("startWeight").value);
       const height = parseFloat(document.getElementById("height").value);
@@ -108,6 +375,7 @@
       updateResults();
     }
 
+    // Añadir nuevo peso
     function addWeight() {
       const weightInput = document.getElementById("weight");
       const weight = parseFloat(weightInput.value);
@@ -130,46 +398,51 @@
       showNotification('Peso añadido correctamente', 'success');
     }
 
+    // Actualizar gráfico
     function updateChart() {
-      chart.data.labels = weights.map((_, i) => `Día ${i+1}`);
-      chart.data.datasets[0].data = weights;
-      chart.update();
-      updateResults();
-    }
-
-    function updateResults() {
-      if (profile.startWeight && profile.goal) {
-        const last = weights[weights.length - 1] || profile.startWeight;
-        const diff = last - profile.goal;
-        const resultText = diff > 0 
-          ? `Te faltan ${diff.toFixed(1)} kg para tu meta.`
-          : `¡Has alcanzado tu meta! 🎉`;
-        document.getElementById("results").innerText = 
-          `Último peso: ${last} kg\n${resultText}`;
+      if (chart) {
+        chart.data.labels = weights.map((_, i) => `Día ${i+1}`);
+        chart.data.datasets[0].data = weights;
+        chart.update();
+        updateResults();
       }
     }
 
+    // Actualizar resultados
+    function updateResults() {
+      if (profile.startWeight && profile.goal) {
+        const last = weights[weights.length - 1] || profile.startWeight;
+        const diff = (last - profile.goal).toFixed(1);
+        const resultText = diff > 0 
+          ? `Te faltan ${diff} kg para tu meta.`
+          : `¡Felicidades! Has superado tu meta por ${Math.abs(diff)} kg 🎉`;
+        
+        document.getElementById("results").innerHTML = `
+          <strong>Último peso:</strong> ${last} kg<br>
+          ${resultText}
+        `;
+      }
+    }
+
+    // Mostrar notificación
     function showNotification(message, type) {
+      // Eliminar notificación existente si hay una
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+      
       const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
       notification.textContent = message;
-      notification.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 12px 24px;
-        border-radius: 30px;
-        color: white;
-        font-weight: bold;
-        z-index: 1000;
-        background: ${type === 'success' ? '#4caf50' : '#f44336'};
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      `;
       
       document.body.appendChild(notification);
       
+      // Eliminar después de 3 segundos
       setTimeout(() => {
-        document.body.removeChild(notification);
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
       }, 3000);
     }
 
@@ -183,23 +456,15 @@
     });
 
     function showInstallPromotion() {
+      // Eliminar botón existente si hay uno
+      const existingButton = document.getElementById('installButton');
+      if (existingButton) {
+        existingButton.remove();
+      }
+      
       const installButton = document.createElement('button');
-      installButton.textContent = 'Instalar WeighBuddy';
       installButton.id = 'installButton';
-      installButton.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        background: linear-gradient(135deg, #3a0ca3, #7209b7);
-        color: white;
-        border: none;
-        border-radius: 30px;
-        cursor: pointer;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        z-index: 1000;
-        font-weight: bold;
-      `;
+      installButton.innerHTML = '<i class="fa-solid fa-download"></i> Instalar App';
       
       installButton.addEventListener('click', async () => {
         if (!deferredPrompt) return;
@@ -212,39 +477,23 @@
         }
         
         deferredPrompt = null;
-        document.body.removeChild(installButton);
+        installButton.style.display = 'none';
       });
       
       document.body.appendChild(installButton);
     }
 
-    // Cargar datos guardados
-    if (profile.startWeight) document.getElementById("startWeight").value = profile.startWeight;
-    if (profile.height) document.getElementById("height").value = profile.height;
-    if (profile.goal) document.getElementById("goal").value = profile.goal;
-    updateChart();
-
-    // Solicitar permiso para notificaciones (opcional)
-    function askNotificationPermission() {
-      if (!('Notification' in window)) {
-        console.log('Notificaciones no soportadas');
-        return;
-      }
+    // Cargar datos guardados al iniciar
+    document.addEventListener('DOMContentLoaded', function() {
+      if (profile.startWeight) document.getElementById("startWeight").value = profile.startWeight;
+      if (profile.height) document.getElementById("height").value = profile.height;
+      if (profile.goal) document.getElementById("goal").value = profile.goal;
       
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          console.log('Permiso para notificaciones concedido');
-        }
-      });
-    }
+      initChart();
+      updateResults();
+    });
 
-    // Llamar a la función de permiso de notificaciones cuando el usuario interactúe
-    // Por ejemplo, al hacer clic en un botón o al guardar el perfil
-    // askNotificationPermission();
-  </script>
-
-  <!-- Registrar Service Worker -->
-  <script>
+    // Registrar Service Worker
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js")
         .then(() => console.log("Service Worker registrado"))
