@@ -36,6 +36,12 @@ main {
   padding: 20px;
   margin-bottom: 20px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
 /* Títulos dentro de tarjetas */
@@ -104,4 +110,56 @@ button:hover {
 canvas {
   margin-top: 20px;
   max-width: 100%;
+}
+
+/* Estados de carga */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Mejoras para dispositivos móviles */
+@media (max-width: 500px) {
+  main {
+    padding: 10px;
+  }
+  
+  .card {
+    padding: 15px;
+  }
+  
+  input, button {
+    padding: 10px;
+  }
+}
+
+/* Modo oscuro opcional */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: linear-gradient(135deg, #1a1a40, #4a0072);
+  }
+  
+  .card {
+    background: #2d2b55;
+    color: #f1f1f1;
+  }
+  
+  input {
+    background: #1e1e2e;
+    color: #f1f1f1;
+    border-color: #444;
+  }
+  
+  #results {
+    color: #f1f1f1;
+  }
 }
