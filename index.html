@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Weigh Buddy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f9c74f;
+            --danger: #f94144;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            font-size: 1.8rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .main-content {
+            padding: 2rem 0;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 20px;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .user-profile {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        .stats {
+            margin: 20px 0;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .main-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .weight-form {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+        }
+        
+        .weight-history {
+            margin-top: 30px;
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .history-table th, .history-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .history-table th {
+            background: var(--light);
+            font-weight: 600;
+        }
+        
+        .history-table tr:hover {
+            background: var(--light);
+        }
+        
+        .notification-settings {
+            margin-top: 30px;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gray);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .notification-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        
+        .notification-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            nav ul {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-weight"></i>
+                    <span>Daily Weigh Buddy</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="active">Inicio</a></li>
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">Configuración</a></li>
+                        <li><a href="#">Ayuda</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="dashboard">
+                <div class="sidebar">
+                    <div class="user-profile">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3 id="username">Usuario</h3>
+                        <p>Miembro desde: <span id="member-since">Ene 2023</span></p>
+                    </div>
+                    
+                    <div class="stats">
+                        <h4>Estadísticas</h4>
+                        <div class="stat-item">
+                            <span>Peso inicial:</span>
+                            <span id="initial-weight">70 kg</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Peso actual:</span>
+                            <span id="current-weight">68 kg</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Objetivo:</span>
+                            <span id="target-weight">65 kg</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Progreso:</span>
+                            <span id="progress">-2 kg</span>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-settings">
+                        <h4>Notificaciones</h4>
+                        <div class="setting-item">
+                            <span>Recordatorio diario</span>
+                            <label class="switch">
+                                <input type="checkbox" id="daily-reminder">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <span>Logros</span>
+                            <label class="switch">
+                                <input type="checkbox" id="achievements" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="main-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Registro de Peso</h2>
+                        <button class="btn btn-primary" id="export-btn">
+                            <i class="fas fa-download"></i> Exportar Datos
+                        </button>
+                    </div>
+                    
+                    <div class="weight-form">
+                        <h3>Agregar nuevo registro</h3>
+                        <form id="weight-form">
+                            <div class="form-group">
+                                <label for="weight">Peso (kg)</label>
+                                <input type="number" step="0.1" class="form-control" id="weight-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="date">Fecha</label>
+                                <input type="date" class="form-control" id="date-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="notes">Notas (opcional)</label>
+                                <input type="text" class="form-control" id="notes-input" placeholder="Cómo te sientes hoy...">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Guardar registro</button>
+                        </form>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="weight-chart"></canvas>
+                    </div>
+                    
+                    <div class="weight-history">
+                        <h3>Historial de peso</h3>
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Peso</th>
+                                    <th>Cambio</th>
+                                    <th>Notas</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-body">
+                                <!-- Los registros se insertarán aquí dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2023 Daily Weigh Buddy. Todos los derechos reservados.</p>
+                <div class="footer-links">
+                    <a href="#">Privacidad</a>
+                    <a href="#">Términos</a>
+                    <a href="#">Soporte</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="notification-toast" id="notification-toast">
+        <i class="fas fa-bell"></i>
+        <span id="toast-message">Notificación de ejemplo</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Datos de ejemplo
+        let userData = {
+            username: "Usuario Ejemplo",
+            memberSince: "Ene 2023",
+            initialWeight: 70,
+            targetWeight: 65,
+            notifications: {
+                dailyReminder: false,
+                achievements: true
+            },
+            weightEntries: [
+                { date: "2023-01-01", weight: 70, notes: "Inicio" },
+                { date: "2023-01-15", weight: 69.5, notes: "Buen progreso" },
+                { date: "2023-02-01", weight: 69, notes: "" },
+                { date: "2023-02-15", weight: 68.5, notes: "Ejercicio regular" },
+                { date: "2023-03-01", weight: 68, notes: "Meta cerca" }
+            ]
+        };
+
+        // Cargar datos desde localStorage si existen
+        function loadUserData() {
+            const savedData = localStorage.getItem('dailyWeighBuddyData');
+            if (savedData) {
+                userData = JSON.parse(savedData);
+            }
+            updateUI();
+        }
+
+        // Guardar datos en localStorage
+        function saveUserData() {
+            localStorage.setItem('dailyWeighBuddyData', JSON.stringify(userData));
+        }
+
+        // Actualizar la interfaz con los datos actuales
+        function updateUI() {
+            // Actualizar información del usuario
+            document.getElementById('username').textContent = userData.username;
+            document.getElementById('member-since').textContent = userData.memberSince;
+            document.getElementById('initial-weight').textContent = userData.initialWeight + ' kg';
+            document.getElementById('target-weight').textContent = userData.targetWeight + ' kg';
+            
+            // Calcular peso actual y progreso
+            const currentWeight = userData.weightEntries.length > 0 ? 
+                userData.weightEntries[userData.weightEntries.length - 1].weight : userData.initialWeight;
+            const progress = (currentWeight - userData.initialWeight).toFixed(1);
+            
+            document.getElementById('current-weight').textContent = currentWeight + ' kg';
+            document.getElementById('progress').textContent = `${progress > 0 ? '+' : ''}${progress} kg`;
+            
+            // Actualizar configuraciones de notificación
+            document.getElementById('daily-reminder').checked = userData.notifications.dailyReminder;
+            document.getElementById('achievements').checked = userData.notifications.achievements;
+            
+            // Actualizar historial
+            updateHistoryTable();
+            
+            // Actualizar gráfico
+            updateWeightChart();
+        }
+
+        // Actualizar la tabla de historial
+        function updateHistoryTable() {
+            const historyBody = document.getElementById('history-body');
+            historyBody.innerHTML = '';
+            
+            // Ordenar entradas por fecha (más recientes primero)
+            const sortedEntries = [...userData.weightEntries].sort((a, b) => 
+                new Date(b.date) - new Date(a.date)
+            );
+            
+            sortedEntries.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                
+                // Formatear fecha
+                const dateObj = new Date(entry.date);
+                const formattedDate = dateObj.toLocaleDateString('es-ES');
+                
+                // Calcular cambio respecto a la entrada anterior
+                let change = '';
+                if (index < sortedEntries.length - 1) {
+                    const prevWeight = sortedEntries[index + 1].weight;
+                    const diff = (entry.weight - prevWeight).toFixed(1);
+                    change = `${diff > 0 ? '+' : ''}${diff} kg`;
+                }
+                
+                row.innerHTML = `
+                    <td>${formattedDate}</td>
+                    <td>${entry.weight} kg</td>
+                    <td>${change}</td>
+                    <td>${entry.notes}</td>
+                    <td>
+                        <button class="btn" onclick="editEntry('${entry.date}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn" onclick="deleteEntry('${entry.date}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                historyBody.appendChild(row);
+            });
+        }
+
+        // Actualizar el gráfico de peso
+        function updateWeightChart() {
+            const ctx = document.getElementById('weight-chart').getContext('2d');
+            
+            // Ordenar entradas por fecha (más antiguas primero)
+            const sortedEntries = [...userData.weightEntries].sort((a, b) => 
+                new Date(a.date) - new Date(b.date)
+            );
+            
+            const dates = sortedEntries.map(entry => {
+                const dateObj = new Date(entry.date);
+                return dateObj.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+            });
+            
+            const weights = sortedEntries.map(entry => entry.weight);
+            
+            if (window.weightChart) {
+                window.weightChart.destroy();
+            }
+            
+            window.weightChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Peso (kg)',
+                        data: weights,
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Agregar nueva entrada de peso
+        function addWeightEntry(event) {
+            event.preventDefault();
+            
+            const weight = parseFloat(document.getElementById('weight-input').value);
+            const date = document.getElementById('date-input').value;
+            const notes = document.getElementById('notes-input').value;
+            
+            if (!weight || !date) {
+                showNotification('Por favor, complete todos los campos obligatorios', 'error');
+                return;
+            }
+            
+            // Verificar si ya existe una entrada para esta fecha
+            const existingIndex = userData.weightEntries.findIndex(entry => entry.date === date);
+            
+            if (existingIndex !== -1) {
+                // Actualizar entrada existente
+                userData.weightEntries[existingIndex] = { date, weight, notes };
+                showNotification('Entrada actualizada correctamente');
+            } else {
+                // Agregar nueva entrada
+                userData.weightEntries.push({ date, weight, notes });
+                showNotification('Peso registrado correctamente');
+            }
+            
+            // Guardar y actualizar UI
+            saveUserData();
+            updateUI();
+            
+            // Reiniciar formulario
+            document.getElementById('weight-form').reset();
+            
+            // Programar notificaciones si están activadas
+            scheduleNotifications();
+        }
+
+        // Editar entrada
+        function editEntry(date) {
+            const entry = userData.weightEntries.find(entry => entry.date === date);
+            if (entry) {
+                document.getElementById('weight-input').value = entry.weight;
+                document.getElementById('date-input').value = entry.date;
+                document.getElementById('notes-input').value = entry.notes;
+                
+                // Desplazarse al formulario
+                document.getElementById('weight-input').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Eliminar entrada
+        function deleteEntry(date) {
+            if (confirm('¿Está seguro de que desea eliminar este registro?')) {
+                userData.weightEntries = userData.weightEntries.filter(entry => entry.date !== date);
+                saveUserData();
+                updateUI();
+                showNotification('Registro eliminado correctamente');
+            }
+        }
+
+        // Exportar datos
+        function exportData() {
+            const dataStr = JSON.stringify(userData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'daily-weigh-buddy-data.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('Datos exportados correctamente');
+        }
+
+        // Mostrar notificación
+        function showNotification(message, type = 'success') {
+            const toast = document.getElementById('notification-toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            
+            // Cambiar color según el tipo
+            if (type === 'error') {
+                toast.style.background = '#f94144';
+            } else {
+                toast.style.background = '#4cc9f0';
+            }
+            
+            // Mostrar notificación
+            toast.classList.add('show');
+            
+            // Ocultar después de 3 segundos
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Programar notificaciones
+        function scheduleNotifications() {
+            // Limpiar notificaciones existentes
+            if (window.notificationInterval) {
+                clearInterval(window.notificationInterval);
+            }
+            
+            // Verificar si las notificaciones están activadas
+            if (userData.notifications.dailyReminder) {
+                // Verificar si el usuario ya registró el peso hoy
+                const today = new Date().toISOString().split('T')[0];
+                const todayEntry = userData.weightEntries.find(entry => entry.date === today);
+                
+                if (!todayEntry) {
+                    // Mostrar notificación después de 5 segundos (simulando recordatorio)
+                    setTimeout(() => {
+                        if (Notification.permission === 'granted') {
+                            new Notification('Daily Weigh Buddy', {
+                                body: '¡No olvides registrar tu peso hoy!',
+                                icon: 'https://daily-weigh-buddy.lovable.app/favicon.ico'
+                            });
+                        } else if (Notification.permission !== 'denied') {
+                            Notification.requestPermission().then(permission => {
+                                if (permission === 'granted') {
+                                    new Notification('Daily Weigh Buddy', {
+                                        body: '¡No olvides registrar tu peso hoy!',
+                                        icon: 'https://daily-weigh-buddy.lovable.app/favicon.ico'
+                                    });
+                                }
+                            });
+                        }
+                    }, 5000);
+                }
+                
+                // Configurar recordatorio diario (cada 24 horas)
+                window.notificationInterval = setInterval(() => {
+                    const today = new Date().toISOString().split('T')[0];
+                    const todayEntry = userData.weightEntries.find(entry => entry.date === today);
+                    
+                    if (!todayEntry && Notification.permission === 'granted') {
+                        new Notification('Daily Weigh Buddy', {
+                            body: '¡No olvides registrar tu peso hoy!',
+                            icon: 'https://daily-weigh-buddy.lovable.app/favicon.ico'
+                        });
+                    }
+                }, 24 * 60 * 60 * 1000); // 24 horas
+            }
+        }
+
+        // Inicializar la aplicación
+        function initApp() {
+            // Cargar datos
+            loadUserData();
+            
+            // Configurar event listeners
+            document.getElementById('weight-form').addEventListener('submit', addWeightEntry);
+            document.getElementById('export-btn').addEventListener('click', exportData);
+            
+            document.getElementById('daily-reminder').addEventListener('change', function() {
+                userData.notifications.dailyReminder = this.checked;
+                saveUserData();
+                
+                if (this.checked) {
+                    // Solicitar permiso para notificaciones
+                    if (Notification.permission === 'default') {
+                        Notification.requestPermission().then(permission => {
+                            if (permission === 'granted') {
+                                showNotification('Recordatorios activados');
+                                scheduleNotifications();
+                            } else {
+                                this.checked = false;
+                                userData.notifications.dailyReminder = false;
+                                saveUserData();
+                                showNotification('Para recibir recordatorios, por favor permite las notificaciones', 'error');
+                            }
+                        });
+                    } else if (Notification.permission === 'granted') {
+                        showNotification('Recordatorios activados');
+                        scheduleNotifications();
+                    } else {
+                        this.checked = false;
+                        userData.notifications.dailyReminder = false;
+                        saveUserData();
+                        showNotification('Has bloqueado las notificaciones. Debes permitirlas en la configuración de tu navegador.', 'error');
+                    }
+                } else {
+                    showNotification('Recordatorios desactivados');
+                }
+            });
+            
+            document.getElementById('achievements').addEventListener('change', function() {
+                userData.notifications.achievements = this.checked;
+                saveUserData();
+                
+                if (this.checked) {
+                    showNotification('Notificaciones de logros activadas');
+                } else {
+                    showNotification('Notificaciones de logros desactivadas');
+                }
+            });
+            
+            // Establecer la fecha de hoy por defecto en el formulario
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date-input').value = today;
+            
+            // Programar notificaciones si están activadas
+            scheduleNotifications();
+        }
+
+        // Iniciar la aplicación cuando se cargue el DOM
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
