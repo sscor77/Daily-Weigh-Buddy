@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Weigh Buddy</title>
+    <meta name="description" content="Aplicación para registrar y hacer seguimiento de tu peso diario">
+    <meta name="theme-color" content="#4361ee">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚖️</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚖️</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -44,6 +49,28 @@
             color: white;
             padding: 1rem 0;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .install-btn {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            padding: 8px 15px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+        
+        .install-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
         
         .header-content {
@@ -573,6 +600,31 @@
             border: 0;
         }
         
+        /* Indicador de conexión */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            background: var(--gray);
+            color: white;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        .connection-status.online {
+            background: var(--success);
+        }
+        
+        .connection-status.offline {
+            background: var(--danger);
+        }
+        
         @media (max-width: 992px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -599,6 +651,14 @@
                 justify-content: center;
             }
             
+            .install-btn {
+                position: relative;
+                right: 0;
+                top: 0;
+                transform: none;
+                margin-top: 10px;
+            }
+            
             .form-grid {
                 grid-template-columns: 1fr;
             }
@@ -622,6 +682,9 @@
 <body>
     <header>
         <div class="container">
+            <button class="install-btn" id="installBtn">
+                <i class="fas fa-download"></i> Instalar App
+            </button>
             <div class="header-content">
                 <div class="logo">
                     <i class="fas fa-weight"></i>
@@ -823,6 +886,11 @@
     <div class="notification-toast" id="notification-toast">
         <i class="fas fa-bell"></i>
         <span id="toast-message">Notificación de ejemplo</span>
+    </div>
+
+    <div class="connection-status" id="connectionStatus">
+        <i class="fas fa-wifi"></i>
+        <span>Conectado</span>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1267,6 +1335,78 @@
             showNotification('Perfil actualizado correctamente');
         }
 
+        // ===== FUNCIONALIDADES PWA =====
+        
+        // Registrar Service Worker
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }, function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+                });
+            }
+        }
+        
+        // Manejar la instalación de la PWA
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+        
+        function setupPWAInstall() {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Prevenir que el mini-infobar aparezca en mobile
+                e.preventDefault();
+                // Guardar el evento para que pueda ser activado después
+                deferredPrompt = e;
+                // Mostrar el botón de instalación
+                installBtn.style.display = 'flex';
+                
+                installBtn.addEventListener('click', () => {
+                    // Ocultar nuestro botón de instalación
+                    installBtn.style.display = 'none';
+                    // Mostrar el prompt de instalación
+                    deferredPrompt.prompt();
+                    // Esperar a que el usuario responda al prompt
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('Usuario aceptó la instalación');
+                        } else {
+                            console.log('Usuario rechazó la instalación');
+                        }
+                        deferredPrompt = null;
+                    });
+                });
+            });
+            
+            window.addEventListener('appinstalled', (evt) => {
+                console.log('App instalada');
+                installBtn.style.display = 'none';
+            });
+        }
+        
+        // Monitorear estado de conexión
+        function setupConnectionMonitoring() {
+            const connectionStatus = document.getElementById('connectionStatus');
+            
+            function updateConnectionStatus() {
+                if (navigator.onLine) {
+                    connectionStatus.className = 'connection-status online';
+                    connectionStatus.innerHTML = '<i class="fas fa-wifi"></i> <span>Conectado</span>';
+                } else {
+                    connectionStatus.className = 'connection-status offline';
+                    connectionStatus.innerHTML = '<i class="fas fa-wifi-slash"></i> <span>Sin conexión</span>';
+                    showNotification('Modo sin conexión activado. Los datos se guardarán localmente.', 'warning');
+                }
+            }
+            
+            window.addEventListener('online', updateConnectionStatus);
+            window.addEventListener('offline', updateConnectionStatus);
+            updateConnectionStatus();
+        }
+
         // Inicializar la aplicación
         function initApp() {
             // Cargar datos
@@ -1318,6 +1458,11 @@
             
             // Programar notificaciones si están activadas
             scheduleNotifications();
+            
+            // Configurar PWA
+            registerServiceWorker();
+            setupPWAInstall();
+            setupConnectionMonitoring();
             
             // Mostrar mensaje sobre persistencia de datos
             console.log("¡Los datos se guardan en el almacenamiento local de tu navegador!");
