@@ -5,81 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WeighBuddy</title>
 
-  <!-- Manifest y tema -->
+  <!-- Manifest y colores -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#3a0ca3">
 
-  <!-- Estilos -->
+  <!-- Iconos -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: #f5f5f5;
-    }
-    h1 {
-      text-align: center;
-      color: #3a0ca3;
-    }
-    .container {
-      max-width: 400px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    label {
-      display: block;
-      margin: 10px 0 5px;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #3a0ca3;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #5f0fbf;
-    }
-    #results {
-      margin-top: 20px;
-      text-align: center;
-    }
-    canvas {
-      margin-top: 20px;
-      max-width: 100%;
-    }
-  </style>
+
+  <!-- Estilos externos -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>WeighBuddy</h1>
-  <div class="container">
-    <label for="weight">Introduce tu peso (kg):</label>
-    <input type="number" id="weight" placeholder="Ej: 70">
-    <button onclick="addWeight()">Guardar peso</button>
+  <header>
+    <h1><i class="fa-solid fa-weight-scale"></i> WeighBuddy</h1>
+    <p>Tu compañero para seguir tu progreso</p>
+  </header>
 
-    <div id="results"></div>
-    <canvas id="weightChart"></canvas>
-  </div>
+  <main>
+    <section class="card">
+      <h2>Datos personales</h2>
+      <label for="startWeight">Peso inicial (kg):</label>
+      <input type="number" id="startWeight">
+
+      <label for="height">Altura (cm):</label>
+      <input type="number" id="height">
+
+      <label for="goal">Meta de peso (kg):</label>
+      <input type="number" id="goal">
+
+      <button onclick="saveProfile()"><i class="fa-solid fa-user-check"></i> Guardar perfil</button>
+    </section>
+
+    <section class="card">
+      <h2>Seguimiento</h2>
+      <label for="weight">Nuevo peso (kg):</label>
+      <input type="number" id="weight">
+      <button onclick="addWeight()"><i class="fa-solid fa-plus"></i> Añadir peso</button>
+
+      <div id="results"></div>
+      <canvas id="weightChart"></canvas>
+    </section>
+  </main>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- App -->
+  <!-- Lógica -->
   <script>
+    let profile = JSON.parse(localStorage.getItem("profile")) || { startWeight: null, height: null, goal: null };
     let weights = JSON.parse(localStorage.getItem("weights")) || [];
+
     const ctx = document.getElementById("weightChart").getContext("2d");
     let chart = new Chart(ctx, {
       type: "line",
@@ -90,10 +65,26 @@
           data: weights,
           borderColor: "#3a0ca3",
           backgroundColor: "rgba(58,12,163,0.2)",
-          fill: true
+          fill: true,
+          tension: 0.3,
+          pointRadius: 5,
+          pointBackgroundColor: "#7209b7"
         }]
+      },
+      options: {
+        plugins: {
+          legend: { display: false }
+        }
       }
     });
+
+    function saveProfile() {
+      profile.startWeight = parseFloat(document.getElementById("startWeight").value);
+      profile.height = parseFloat(document.getElementById("height").value);
+      profile.goal = parseFloat(document.getElementById("goal").value);
+      localStorage.setItem("profile", JSON.stringify(profile));
+      updateResults();
+    }
 
     function addWeight() {
       const weightInput = document.getElementById("weight");
@@ -102,7 +93,6 @@
         weights.push(weight);
         localStorage.setItem("weights", JSON.stringify(weights));
         updateChart();
-        document.getElementById("results").innerText = `Último peso: ${weight} kg`;
         weightInput.value = "";
       }
     }
@@ -111,8 +101,24 @@
       chart.data.labels = weights.map((_, i) => `Día ${i+1}`);
       chart.data.datasets[0].data = weights;
       chart.update();
+      updateResults();
     }
 
+    function updateResults() {
+      if (profile.startWeight && profile.goal) {
+        const last = weights[weights.length - 1] || profile.startWeight;
+        const diff = last - profile.goal;
+        const resultText = diff > 0 
+          ? `Te faltan ${diff.toFixed(1)} kg para tu meta.`
+          : `¡Has alcanzado tu meta! 🎉`;
+        document.getElementById("results").innerText = 
+          `Último peso: ${last} kg\n${resultText}`;
+      }
+    }
+
+    if (profile.startWeight) document.getElementById("startWeight").value = profile.startWeight;
+    if (profile.height) document.getElementById("height").value = profile.height;
+    if (profile.goal) document.getElementById("goal").value = profile.goal;
     updateChart();
   </script>
 
