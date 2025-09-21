@@ -102,6 +102,7 @@
         .user-profile {
             text-align: center;
             margin-bottom: 20px;
+            position: relative;
         }
         
         .user-avatar {
@@ -115,6 +116,34 @@
             margin: 0 auto 10px;
             font-size: 2rem;
             color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .edit-profile-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--light-gray);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .edit-profile-btn:hover {
+            background: var(--primary);
+            color: white;
         }
         
         .stats {
@@ -190,6 +219,17 @@
         
         .btn-primary:hover {
             background: var(--secondary);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
         }
         
         .chart-container {
@@ -324,6 +364,53 @@
             opacity: 1;
         }
         
+        /* Modal de edición de perfil */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
         @media (max-width: 768px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -336,6 +423,12 @@
             
             nav ul {
                 gap: 10px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
             }
         }
     </style>
@@ -353,7 +446,6 @@
                         <li><a href="#" class="active">Inicio</a></li>
                         <li><a href="#">Dashboard</a></li>
                         <li><a href="#">Configuración</a></li>
-                        <li><a href="#">Ayuda</a></li>
                     </ul>
                 </nav>
             </div>
@@ -365,30 +457,33 @@
             <div class="dashboard">
                 <div class="sidebar">
                     <div class="user-profile">
-                        <div class="user-avatar">
+                        <div class="user-avatar" id="edit-profile-avatar">
                             <i class="fas fa-user"></i>
                         </div>
+                        <button class="edit-profile-btn" id="edit-profile-btn">
+                            <i class="fas fa-pen"></i>
+                        </button>
                         <h3 id="username">Usuario</h3>
-                        <p>Miembro desde: <span id="member-since">Ene 2023</span></p>
+                        <p id="user-details">Edad: - | Altura: - cm | Peso inicial: - kg</p>
                     </div>
                     
                     <div class="stats">
                         <h4>Estadísticas</h4>
                         <div class="stat-item">
                             <span>Peso inicial:</span>
-                            <span id="initial-weight">70 kg</span>
+                            <span id="initial-weight">- kg</span>
                         </div>
                         <div class="stat-item">
                             <span>Peso actual:</span>
-                            <span id="current-weight">68 kg</span>
+                            <span id="current-weight">- kg</span>
                         </div>
                         <div class="stat-item">
                             <span>Objetivo:</span>
-                            <span id="target-weight">65 kg</span>
+                            <span id="target-weight">- kg</span>
                         </div>
                         <div class="stat-item">
                             <span>Progreso:</span>
-                            <span id="progress">-2 kg</span>
+                            <span id="progress">- kg</span>
                         </div>
                     </div>
                     
@@ -398,13 +493,6 @@
                             <span>Recordatorio diario</span>
                             <label class="switch">
                                 <input type="checkbox" id="daily-reminder">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="setting-item">
-                            <span>Logros</span>
-                            <label class="switch">
-                                <input type="checkbox" id="achievements" checked>
                                 <span class="slider"></span>
                             </label>
                         </div>
@@ -471,11 +559,43 @@
                 <div class="footer-links">
                     <a href="#">Privacidad</a>
                     <a href="#">Términos</a>
-                    <a href="#">Soporte</a>
                 </div>
             </div>
         </div>
     </footer>
+
+    <!-- Modal de edición de perfil -->
+    <div class="modal" id="profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Editar Perfil</h3>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <form id="profile-form">
+                <div class="form-group">
+                    <label for="profile-name">Nombre</label>
+                    <input type="text" class="form-control" id="profile-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="profile-age">Edad</label>
+                    <input type="number" class="form-control" id="profile-age" min="1" max="120">
+                </div>
+                <div class="form-group">
+                    <label for="profile-height">Altura (cm)</label>
+                    <input type="number" class="form-control" id="profile-height" min="50" max="250" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="profile-initial-weight">Peso inicial (kg)</label>
+                    <input type="number" step="0.1" class="form-control" id="profile-initial-weight" min="1" max="500">
+                </div>
+                <div class="form-group">
+                    <label for="profile-target-weight">Peso objetivo (kg)</label>
+                    <input type="number" step="0.1" class="form-control" id="profile-target-weight" min="1" max="500">
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            </form>
+        </div>
+    </div>
 
     <div class="notification-toast" id="notification-toast">
         <i class="fas fa-bell"></i>
@@ -484,23 +604,18 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Datos de ejemplo
+        // Datos de usuario
         let userData = {
-            username: "Usuario Ejemplo",
-            memberSince: "Ene 2023",
-            initialWeight: 70,
-            targetWeight: 65,
+            name: "Usuario",
+            age: null,
+            height: null,
+            initialWeight: null,
+            targetWeight: null,
+            memberSince: new Date().toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
             notifications: {
-                dailyReminder: false,
-                achievements: true
+                dailyReminder: false
             },
-            weightEntries: [
-                { date: "2023-01-01", weight: 70, notes: "Inicio" },
-                { date: "2023-01-15", weight: 69.5, notes: "Buen progreso" },
-                { date: "2023-02-01", weight: 69, notes: "" },
-                { date: "2023-02-15", weight: 68.5, notes: "Ejercicio regular" },
-                { date: "2023-03-01", weight: 68, notes: "Meta cerca" }
-            ]
+            weightEntries: []
         };
 
         // Cargar datos desde localStorage si existen
@@ -520,22 +635,29 @@
         // Actualizar la interfaz con los datos actuales
         function updateUI() {
             // Actualizar información del usuario
-            document.getElementById('username').textContent = userData.username;
-            document.getElementById('member-since').textContent = userData.memberSince;
-            document.getElementById('initial-weight').textContent = userData.initialWeight + ' kg';
-            document.getElementById('target-weight').textContent = userData.targetWeight + ' kg';
+            document.getElementById('username').textContent = userData.name;
+            
+            const userDetails = `Edad: ${userData.age || '-'} | Altura: ${userData.height || '-'} cm | Peso inicial: ${userData.initialWeight || '-'} kg`;
+            document.getElementById('user-details').textContent = userDetails;
+            
+            document.getElementById('initial-weight').textContent = (userData.initialWeight || '-') + ' kg';
+            document.getElementById('target-weight').textContent = (userData.targetWeight || '-') + ' kg';
             
             // Calcular peso actual y progreso
             const currentWeight = userData.weightEntries.length > 0 ? 
                 userData.weightEntries[userData.weightEntries.length - 1].weight : userData.initialWeight;
-            const progress = (currentWeight - userData.initialWeight).toFixed(1);
             
-            document.getElementById('current-weight').textContent = currentWeight + ' kg';
-            document.getElementById('progress').textContent = `${progress > 0 ? '+' : ''}${progress} kg`;
+            let progress = '-';
+            if (currentWeight && userData.initialWeight) {
+                progress = (currentWeight - userData.initialWeight).toFixed(1);
+                progress = `${progress > 0 ? '+' : ''}${progress} kg`;
+            }
+            
+            document.getElementById('current-weight').textContent = (currentWeight || '-') + ' kg';
+            document.getElementById('progress').textContent = progress;
             
             // Actualizar configuraciones de notificación
             document.getElementById('daily-reminder').checked = userData.notifications.dailyReminder;
-            document.getElementById('achievements').checked = userData.notifications.achievements;
             
             // Actualizar historial
             updateHistoryTable();
@@ -548,6 +670,13 @@
         function updateHistoryTable() {
             const historyBody = document.getElementById('history-body');
             historyBody.innerHTML = '';
+            
+            if (userData.weightEntries.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="5" style="text-align: center;">No hay registros de peso aún</td>`;
+                historyBody.appendChild(row);
+                return;
+            }
             
             // Ordenar entradas por fecha (más recientes primero)
             const sortedEntries = [...userData.weightEntries].sort((a, b) => 
@@ -591,6 +720,19 @@
         // Actualizar el gráfico de peso
         function updateWeightChart() {
             const ctx = document.getElementById('weight-chart').getContext('2d');
+            
+            if (userData.weightEntries.length === 0) {
+                if (window.weightChart) {
+                    window.weightChart.destroy();
+                }
+                
+                // Mostrar mensaje de no hay datos
+                ctx.font = "16px Arial";
+                ctx.fillStyle = "#6c757d";
+                ctx.textAlign = "center";
+                ctx.fillText("No hay datos suficientes para mostrar el gráfico", ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
             
             // Ordenar entradas por fecha (más antiguas primero)
             const sortedEntries = [...userData.weightEntries].sort((a, b) => 
@@ -682,6 +824,7 @@
             
             // Reiniciar formulario
             document.getElementById('weight-form').reset();
+            document.getElementById('date-input').value = new Date().toISOString().split('T')[0];
             
             // Programar notificaciones si están activadas
             scheduleNotifications();
@@ -797,6 +940,43 @@
             }
         }
 
+        // Mostrar modal de edición de perfil
+        function showProfileModal() {
+            const modal = document.getElementById('profile-modal');
+            
+            // Llenar el formulario con los datos actuales
+            document.getElementById('profile-name').value = userData.name;
+            document.getElementById('profile-age').value = userData.age || '';
+            document.getElementById('profile-height').value = userData.height || '';
+            document.getElementById('profile-initial-weight').value = userData.initialWeight || '';
+            document.getElementById('profile-target-weight').value = userData.targetWeight || '';
+            
+            modal.classList.add('show');
+        }
+
+        // Cerrar modal de edición de perfil
+        function closeProfileModal() {
+            const modal = document.getElementById('profile-modal');
+            modal.classList.remove('show');
+        }
+
+        // Guardar datos del perfil
+        function saveProfile(event) {
+            event.preventDefault();
+            
+            userData.name = document.getElementById('profile-name').value;
+            userData.age = document.getElementById('profile-age').value ? parseInt(document.getElementById('profile-age').value) : null;
+            userData.height = document.getElementById('profile-height').value ? parseFloat(document.getElementById('profile-height').value) : null;
+            userData.initialWeight = document.getElementById('profile-initial-weight').value ? parseFloat(document.getElementById('profile-initial-weight').value) : null;
+            userData.targetWeight = document.getElementById('profile-target-weight').value ? parseFloat(document.getElementById('profile-target-weight').value) : null;
+            
+            saveUserData();
+            updateUI();
+            closeProfileModal();
+            
+            showNotification('Perfil actualizado correctamente');
+        }
+
         // Inicializar la aplicación
         function initApp() {
             // Cargar datos
@@ -805,6 +985,10 @@
             // Configurar event listeners
             document.getElementById('weight-form').addEventListener('submit', addWeightEntry);
             document.getElementById('export-btn').addEventListener('click', exportData);
+            document.getElementById('edit-profile-btn').addEventListener('click', showProfileModal);
+            document.getElementById('edit-profile-avatar').addEventListener('click', showProfileModal);
+            document.getElementById('close-modal').addEventListener('click', closeProfileModal);
+            document.getElementById('profile-form').addEventListener('submit', saveProfile);
             
             document.getElementById('daily-reminder').addEventListener('change', function() {
                 userData.notifications.dailyReminder = this.checked;
@@ -835,17 +1019,6 @@
                     }
                 } else {
                     showNotification('Recordatorios desactivados');
-                }
-            });
-            
-            document.getElementById('achievements').addEventListener('change', function() {
-                userData.notifications.achievements = this.checked;
-                saveUserData();
-                
-                if (this.checked) {
-                    showNotification('Notificaciones de logros activadas');
-                } else {
-                    showNotification('Notificaciones de logros desactivadas');
                 }
             });
             
