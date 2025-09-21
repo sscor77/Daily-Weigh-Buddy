@@ -6,9 +6,19 @@
     <title>Daily Weigh Buddy</title>
     <meta name="description" content="Aplicación para registrar y hacer seguimiento de tu peso diario">
     <meta name="theme-color" content="#4361ee">
-    <link rel="manifest" href="manifest.json">
+    
+    <!-- Metaetiquetas para iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Daily Weigh Buddy">
+    
+    <!-- Iconos para diferentes dispositivos -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚖️</text></svg>">
+    <link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚖️</text></svg>">
+    <link rel="icon" type="image/png" sizes="16x16" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚖️</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚖️</text></svg>">
+    <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Daily%20Weigh%20Buddy%22%2C%22short_name%22%3A%22WeighBuddy%22%2C%22description%22%3A%22Aplicaci%C3%B3n%20para%20registrar%20y%20hacer%20seguimiento%20de%20tu%20peso%20diario%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%234361ee%22%2C%22theme_color%22%3A%22%233a0ca3%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiIHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiPjxwYXRoIGZpbGw9IiM0MzYxZWUiIGQ9Ik04OTYgNDQ4SDY0MHYtNjRjMC0zNS4zMjgtMjguNjcyLTY0LTY0LTY0cy02NCAyOC42NzItNjQgNjR2NjRIMTI4Yy0zNS4zNDYgMC02NCAyOC42NTQtNjQgNjRzMjguNjU0IDY0IDY0IDY0aDM2OHY2NGMwIDM1LjMyOCAyOC42NzIgNjQgNjQgNjRzNjQtMjguNjcyIDY0LTY0di02NGgyNTZjMzUuMzQ2IDAgNjQtMjguNjU0IDY0LTY0cy0yOC42NTQtNjQtNjQtNjR6Ii8+PHBhdGggZmlsbD0iIzNhMGNhMyIgZD0iTTU3NiA1MTJjMCAzNS4zNDYtMjguNjU0IDY0LTY0IDY0cy02NC0yOC42NTQtNjQtNjQgMjguNjU0LTY0IDY0LTY0IDY0IDI4LjY1NCA2NCA2NHoiLz48cGF0aCBmaWxsPSIjZmY3Mjg1IiBkPSJNNzY4IDU0NGMwIDcwLjY5Mi01Ny4zMDggMTI4LTEyOCAxMjhzLTEyOC01Ny4zMDgtMTI4LTEyOCA1Ny4zMDgtMTI4IDEyOC0xMjggMTI4IDU3LjMwOCAxMjggMTI4eiIvPjxwYXRoIGZpbGw9IiM0Y2M5ZjAiIGQ9Ik04OTYgNzA0SDY0MHYtNjRjMC0zNS4zMjgtMjguNjcyLTY0LTY0LTY0cy02NCAyOC42NzItNjQgNjR2NjRIMTI4Yy0zNS4zNDYgMC02NCAyOC42NTQtNjQgNjRzMjguNjU0IDY0IDY0IDY0aDM2OHY2NGMwIDM1LjMyOCAyOC42NzIgNjQgNjQgNjRzNjQtMjguNjcyIDY0LTY0di02NGgyNTZjMzUuMzQ2IDAgNjQtMjguNjU0IDY0LTY0cy0yOC42NTQtNjQtNjQtNjR6Ii8+PHBhdGggZmlsbD0iIzNhMGNhMyIgZD0iTTU3NiA3NjhjMCAzNS4zNDYtMjguNjU0IDY0LTY0IDY0cy02NC0yOC42NTQtNjQtNjQgMjguNjU0LTY0IDY0LTY0IDY0IDI4LjY1NCA2NCA2NHoiLz48L3N2Zz4%3D%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -1262,36 +1272,10 @@
                 const today = new Date().toISOString().split('T')[0];
                 const todayEntry = userData.weightEntries.find(entry => entry.date === today);
                 
-                if (!todayEntry) {
-                    // Mostrar notificación después de 5 segundos (simulando recordatorio)
-                    setTimeout(() => {
-                        if (Notification.permission === 'granted') {
-                            new Notification('Daily Weigh Buddy', {
-                                body: '¡No olvides registrar tu peso hoy!',
-                                icon: 'https://daily-weigh-buddy.lovable.app/favicon.ico'
-                            });
-                        } else if (Notification.permission !== 'denied') {
-                            Notification.requestPermission().then(permission => {
-                                if (permission === 'granted') {
-                                    new Notification('Daily Weigh Buddy', {
-                                        body: '¡No olvides registrar tu peso hoy!',
-                                        icon: 'https://daily-weigh-buddy.lovable.app/favicon.ico'
-                                    });
-                                }
-                            });
-                        }
-                    }, 5000);
-                }
-                
-                // Configurar recordatorio diario (cada 24 horas)
-                window.notificationInterval = setInterval(() => {
-                    const today = new Date().toISOString().split('T')[0];
-                    const todayEntry = userData.weightEntries.find(entry => entry.date === today);
-                    
-                    if (!todayEntry && Notification.permission === 'granted') {
+                if (!todayEntry && Notification.permission === 'granted') {
                         new Notification('Daily Weigh Buddy', {
                             body: '¡No olvides registrar tu peso hoy!',
-                            icon: 'https://daily-weigh-buddy.lovable.app/favicon.ico'
+                            icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiIHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiPjxwYXRoIGZpbGw9IiM0MzYxZWUiIGQ9Ik04OTYgNDQ4SDY0MHYtNjRjMC0zNS4zMjgtMjguNjcyLTY0LTY0LTY0cy02NCAyOC42NzItNjQgNjR2NjRIMTI4Yy0zNS4zNDYgMC02NCAyOC42NTQtNjQgNjRzMjguNjU0IDY0IDY0IDY0aDM2OHY2NGMwIDM1LjMyOCAyOC42NzIgNjQgNjQgNjRzNjQtMjguNjcyIDY0LTY0di02NGgyNTZjMzUuMzQ2IDAgNjQtMjguNjU0IDY0LTY0cy0yOC42NTQtNjQtNjQtNjR6Ii8+PHBhdGggZmlsbD0iIzNhMGNhMyIgZD0iTTU3NiA1MTJjMCAzNS4zNDYtMjguNjU0IDY0LTY0IDY0cy02NC0yOC42NTQtNjQtNjQgMjguNjU0LTY0IDY0LTY0IDY0IDI4LjY1NCA2NCA2NHoiLz48cGF0aCBmaWxsPSIjZmY3Mjg1IiBkPSJNNzY4IDU0NGMwIDcwLjY5Mi01cy4zMDggMTI4LTEyOCAxMjhzLTEyOC01Ny4zMDgtMTI4LTEyOCA1Ny4zMDgtMTI4IDEyOC0xMjggMTI4IDU3LjMwOCAxMjggMTI4eiIvPjxwYXRoIGZpbGw9IiM0Y2M5ZjAiIGQ9Ik04OTYgNzA0SDY0MHYtNjRjMC0zNS4zMjgtMjguNjcyLTY0LTY0LTY0cy02NCAyOC42NzItNjQgNjR2NjRIMTI4Yy0zNS4zNDYgMC02NCAyOC42NTQtNjQgNjRzMjguNjU0IDY0IDY0IDY0aDM2OHY2NGMwIDM1LjMyOCAyOC42NzIgNjQgNjQgNjRzNjQtMjguNjcyIDY0LTY0di02NGgyNTZjMzUuMzNDYgMCA2NC0yOC42NTQgNjQtNjRzLTI4LjY1NC02NC02NC02NHoiLz48cGF0aCBmaWxsPSIjM2EwY2EzIiBkPSJNNTc2IDc2OGMwIDM1LjM0Ni0yOC42NTQgNjQtNjQgNjRzLTY0LTI4LjY1NC02NC02NCAyOC42NTQtNjQgNjQtNjQgNjQgMjguNjU0IDY0IDY0eiIvPjwvc3ZnPg=='
                         });
                     }
                 }, 24 * 60 * 60 * 1000); // 24 horas
@@ -1340,13 +1324,11 @@
         // Registrar Service Worker
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                    navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    }, function(err) {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
+                navigator.serviceWorker.register('sw.js')
+                .then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
                 });
             }
         }
@@ -1373,6 +1355,7 @@
                     deferredPrompt.userChoice.then((choiceResult) => {
                         if (choiceResult.outcome === 'accepted') {
                             console.log('Usuario aceptó la instalación');
+                            showNotification('¡Aplicación instalada correctamente!');
                         } else {
                             console.log('Usuario rechazó la instalación');
                         }
@@ -1384,6 +1367,7 @@
             window.addEventListener('appinstalled', (evt) => {
                 console.log('App instalada');
                 installBtn.style.display = 'none';
+                showNotification('¡Aplicación instalada correctamente!');
             });
         }
         
